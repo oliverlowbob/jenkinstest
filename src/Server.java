@@ -37,7 +37,9 @@ public class Server extends Thread{
                 System.out.println("Accepted connection from " + clientSocket);
                 //Message to write to client when connected via outputstream
                 OutputStream outputStream = clientSocket.getOutputStream();
-                outputStream.write("You have connected\n".getBytes());
+                outputStream.write(("You have connected\n\r Please write: login <username> to login!\n\r " +
+                        "Message other users by: msg <username> message... \n\r" +
+                        "Write: Users to get a list of current online users\r\n").getBytes());
                 //Server worker, handles communication with client socket
                 ServerWorker worker = new ServerWorker(this, clientSocket);
                 //Adding worker to workerlist

@@ -57,7 +57,7 @@ public class ServerWorker extends Thread {
                 } else if ("login".equalsIgnoreCase(cmd))
                 {
                     //Call handle login method
-                    handleLogin(outputStream, tokens);
+                    handleLogin(outputStream,tokens);
                     
                 } else if ("msg".equalsIgnoreCase(cmd))
                 {
@@ -66,10 +66,13 @@ public class ServerWorker extends Thread {
                     String[] tokensMsg = line.split(" ", 3);
                     //Handles chatmessages between clients
                     handleMessage(tokensMsg);
+                } else if ("users".equalsIgnoreCase(cmd))
+                {
+                    showOnlineList();
                 }
                 else{
                     //If command not known/supported
-                    String msg = "unknown command: " + cmd + "\n";
+                    String msg = "unknown command: " + cmd + "\r\n";
                     outputStream.write(msg.getBytes());
                 }
             }
@@ -77,6 +80,16 @@ public class ServerWorker extends Thread {
 
         //Closing socket
         clientSocket.close();
+
+    }
+
+    private void showOnlineList() throws IOException {
+        List<ServerWorker> workerList = server.getWorkerList();
+        for (ServerWorker worker : workerList)
+        {
+            send("user: " + worker.getUserName() + " is online!\r\n");
+
+        }
 
     }
 
@@ -94,7 +107,7 @@ public class ServerWorker extends Thread {
             if (sendTo.equalsIgnoreCase(worker.userName))
             {
                 //If username matches, send message to username/client
-                String outMsg = userName + " : " + body + "\n";
+                String outMsg = userName + " : " + body + "\r\n";
                 worker.send(outMsg);
             }
         }
@@ -106,7 +119,7 @@ public class ServerWorker extends Thread {
         //Access to workerlist.
         List<ServerWorker> workerList = server.getWorkerList();
         //Message to be sent
-        String onlineMsg = "User: " + userName + " is offline!\n";
+        String onlineMsg = "User: " + userName + " is offline!\r\n";
         //Going through worker in workerList
         for (ServerWorker worker: workerList)
         {
@@ -129,11 +142,13 @@ public class ServerWorker extends Thread {
         if (tokens.length == 2 )
         {
             //Username is going to be the 2nd token, hence [1]
+            //Username is chosen by user by typing: login <username>
             String userName = tokens[1];
 
-            if (userName.equals("guest") || (userName.equals("jim")))
+            //Assuring username is less or max 12 chars
+            if (userName.length() <= 12)
             {
-                String msg = "Ok, logged in\n";
+                String msg = "Ok, logged in\r\n";
                 outputStream.write(msg.getBytes());
                 this.userName = userName;
                 System.out.println("User logged in as: " + userName);
@@ -148,7 +163,7 @@ public class ServerWorker extends Thread {
                     {
                             if (userName.equals(worker.getUserName()))
                             {
-                                String msg2 = "online " + worker.getUserName() + "\n";
+                                String msg2 = "online " + worker.getUserName() + "\r\n";
                                 worker.send(msg2);
                             }
 
@@ -156,7 +171,7 @@ public class ServerWorker extends Thread {
                 }
 
                 //Send other online users current user's status
-                String onlineMsg = "User: " + userName + " is online!\n";
+                String onlineMsg = "User: " + userName + " is online!\r\n";
                 for (ServerWorker worker: workerList)
                 {
                     if (!userName.equals(worker.getUserName()))
@@ -166,7 +181,7 @@ public class ServerWorker extends Thread {
                     }
                 }
             } else {
-                String msg = "Error on login\n";
+                String msg = "Error on login(Remember max 12 char!)\r\n";
                 outputStream.write(msg.getBytes());
             }
         }
