@@ -2,6 +2,10 @@ import java.io.*;
 import java.net.Socket;
 import java.util.List;
 
+/**
+ * @author Jonas
+ */
+
 public class ServerWorker extends Thread {
 
     private final Socket clientSocket;
@@ -9,12 +13,20 @@ public class ServerWorker extends Thread {
     private String userName = null;
     private OutputStream outputStream;
 
+    /**
+     * Constructor
+     * @param server server object
+     * @param clientSocket the client socket
+     */
     public ServerWorker(Server server, Socket clientSocket)
     {
         this.server = server;
         this.clientSocket = clientSocket;
     }
 
+    /**
+     * Run method which will call the handleClientSocket method
+     */
     //Run method for ServerWorker thread
     @Override
     public void run() {
@@ -29,6 +41,14 @@ public class ServerWorker extends Thread {
 
     }
 
+    /**
+     * Method for handling client socket
+     * Access to date from client in- and output
+     * Responsible for reading lines and executing methods based on these lines/commands
+     * such as logoff, users, msg, ect.
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void handleClientSocket() throws IOException, InterruptedException {
         //Access to data from client input
         InputStream inputStream = clientSocket.getInputStream();
@@ -47,7 +67,7 @@ public class ServerWorker extends Thread {
 
             //Avoid nullpointer exceptions
             if(tokens != null && tokens.length > 0) {
-                //First token always going to be our command
+                //First token always going to be the command
                 String cmd = tokens[0];
                 //If message recieved is quit or logoff, break and will close connection.
                 if ("logoff".equalsIgnoreCase(cmd) || "quit".equalsIgnoreCase(cmd)) {
@@ -69,6 +89,9 @@ public class ServerWorker extends Thread {
                 } else if ("users".equalsIgnoreCase(cmd))
                 {
                     showOnlineList();
+                } else if ("help".equalsIgnoreCase(cmd))
+                {
+                  printHelpCommands();
                 }
                 else{
                     //If command not known/supported
@@ -83,6 +106,22 @@ public class ServerWorker extends Thread {
 
     }
 
+    /**
+     * Method to print string to client/user with instructions
+     * @throws IOException
+     */
+    private void printHelpCommands() throws IOException {
+        String msg =
+                "To message others type: msg <user> message \n" +
+                "<Users> will show who is online\n" +
+                "<Quit> or <Logoff> will sign you out!\n";
+        outputStream.write(msg.getBytes());
+    }
+
+    /**
+     * Method to show who is online when user logs in
+     * @throws IOException
+     */
     private void showOnlineList() throws IOException {
         List<ServerWorker> workerList = server.getWorkerList();
         for (ServerWorker worker : workerList)
@@ -93,6 +132,13 @@ public class ServerWorker extends Thread {
 
     }
 
+    /**
+     * Handles messages
+     * breaks messages up to get recieving user and the messagebody
+     * then calls send method to send the message to correct reciever
+     * @param tokens
+     * @throws IOException
+     */
     //For handling chat messages between clients
     //Format: "msg" "login" message..
     private void handleMessage(String[] tokens) throws IOException {
@@ -113,6 +159,13 @@ public class ServerWorker extends Thread {
         }
     }
 
+    /**
+     * Handles logoff
+     * called when user writes quit or logoff
+     * Will call method removeWorker to remove user when logged off
+     * closing socket when logoff occurs
+     * @throws IOException
+     */
     private void handleLogOff() throws IOException {
         //Remove user from worker list when logoff
         server.removeWorker(this);
@@ -134,10 +187,22 @@ public class ServerWorker extends Thread {
     }
 
     //Get username
+
+    /**
+     * Getter for username
+     * @return userName
+     */
     public String getUserName(){
         return userName;
     }
 
+    /**
+     * Handles login
+     * Will send online user notifications
+     * @param outputStream to write message to client
+     * @param tokens to get the username from client
+     * @throws IOException
+     */
     private void handleLogin(OutputStream outputStream, String[] tokens) throws IOException {
         if (tokens.length == 2 )
         {
@@ -183,11 +248,18 @@ public class ServerWorker extends Thread {
             } else {
                 String msg = "Error on login(Remember max 12 char!)\r\n";
                 outputStream.write(msg.getBytes());
+                //Server error code print if login is not successful by a client
+                System.err.println("Login not successful for " + userName);
             }
         }
 
     }
 
+    /**
+     * Send method responsible for writing messages on outputstream
+     * @param Msg takes a String Msg that is to be sent
+     * @throws IOException
+     */
     //Send message to access outputstream of current clientsocket
     //Send message to user.
     private void send(String Msg) throws IOException {

@@ -5,6 +5,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author Jonas
+ */
 public class Server extends Thread{
 
     private final int serverPort;
@@ -12,6 +15,10 @@ public class Server extends Thread{
     //List of server workers
     private ArrayList<ServerWorker> workerList = new ArrayList<>();
 
+    /**
+     * Server constructor
+     * @param serverPort has a port as param.
+     */
     public Server(int serverPort) {
         this.serverPort = serverPort;
     }
@@ -22,6 +29,11 @@ public class Server extends Thread{
         return workerList;
     }
 
+    /**
+     * Run method to continuously accept connections from client
+     * Main thread running this process
+     *
+     */
     @Override
     public void run() {
         //Create server socket
@@ -37,9 +49,7 @@ public class Server extends Thread{
                 System.out.println("Accepted connection from " + clientSocket);
                 //Message to write to client when connected via outputstream
                 OutputStream outputStream = clientSocket.getOutputStream();
-                outputStream.write(("You have connected\n\r Please write: login <username> to login!\n\r " +
-                        "Message other users by: msg <username> message... \n\r" +
-                        "Write: Users to get a list of current online users\r\n").getBytes());
+                outputStream.write(("You have connected. Please write: login <username> to login!\n" + "Write <help> for list of additional commands!\n").getBytes());
                 //Server worker, handles communication with client socket
                 ServerWorker worker = new ServerWorker(this, clientSocket);
                 //Adding worker to workerlist
@@ -53,7 +63,13 @@ public class Server extends Thread{
         }
     }
 
-        //Remove worker from list, used when logoff
+
+
+    /**
+     * Method responsible for removing clients when logging off.
+     * @param serverWorker serverWorker as param, to be removed when a logoff occurs.
+     */
+    //Remove worker from list, used when logoff
     public void removeWorker(ServerWorker serverWorker) {
         workerList.remove(serverWorker);
     }
