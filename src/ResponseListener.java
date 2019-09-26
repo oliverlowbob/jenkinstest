@@ -25,13 +25,16 @@ public class ResponseListener implements Runnable {
         Scanner sc;
         try {
             sc = new Scanner(socket.getInputStream());
-            while (!socket.isClosed() && sc.hasNextLine()) {
+                while (!socket.isClosed() && sc.hasNextLine())
+                {
                 System.out.println(sc.nextLine());
+                }
             }
-        } catch (IOException e) {
+        catch (IOException e)
+            {
             e.printStackTrace();
-        }
+            }
 
-    }
+                    }
 
 }

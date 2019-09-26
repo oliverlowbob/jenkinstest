@@ -79,14 +79,17 @@ public class ServerWorker extends Thread {
                     //Call handle login method
                     handleLogin(outputStream,tokens);
                     
-                } else if ("msg".equalsIgnoreCase(cmd))
+                } else if ("DATA".equalsIgnoreCase(cmd))
                 {
                     //To make sure last token i.e. the message to be sent
                     //doesn't get split
+                    String delimiter1 = ":";
+                    String delimiter2  = " ";
+                    line = line.replaceAll(delimiter1, delimiter2);
                     String[] tokensMsg = line.split(" ", 3);
                     //Handles chatmessages between clients
                     handleMessage(tokensMsg);
-                } else if ("users".equalsIgnoreCase(cmd))
+                } else if ("list".equalsIgnoreCase(cmd))
                 {
                     showOnlineList();
                 } else if ("help".equalsIgnoreCase(cmd))
@@ -112,7 +115,7 @@ public class ServerWorker extends Thread {
      */
     private void printHelpCommands() throws IOException {
         String msg =
-                "To message others type: msg <user> message \n" +
+                "To message others type: data <user> : message \n" +
                 "<Users> will show who is online\n" +
                 "<Quit> or <Logoff> will sign you out!\n";
         outputStream.write(msg.getBytes());
@@ -211,7 +214,7 @@ public class ServerWorker extends Thread {
             String userName = tokens[1];
 
             //Assuring username is less or max 12 chars
-            if (userName.length() <= 12)
+            if (userName.length() <= 12 && !equals(getUserName()))
             {
                 String msg = "Ok, logged in\r\n";
                 outputStream.write(msg.getBytes());
@@ -262,8 +265,10 @@ public class ServerWorker extends Thread {
      */
     //Send message to access outputstream of current clientsocket
     //Send message to user.
-    private void send(String Msg) throws IOException {
-        if (userName!=null) {
+    private void send(String Msg) throws IOException
+    {
+        if (userName!=null)
+        {
             outputStream.write(Msg.getBytes());
         }
     }
