@@ -116,7 +116,7 @@ public class ServerWorker extends Thread {
     private void printHelpCommands() throws IOException {
         String msg =
                 "To message others type: data <user> : message \n" +
-                "<Users> will show who is online\n" +
+                "<List> will show who is online\n" +
                 "<Quit> or <Logoff> will sign you out!\n";
         outputStream.write(msg.getBytes());
     }
@@ -260,16 +260,16 @@ public class ServerWorker extends Thread {
 
     /**
      * Send method responsible for writing messages on outputstream
-     * @param Msg takes a String Msg that is to be sent
+     * @param msg takes a String Msg that is to be sent
      * @throws IOException
      */
     //Send message to access outputstream of current clientsocket
     //Send message to user.
-    private void send(String Msg) throws IOException
+    private void send(String msg) throws IOException
     {
         if (userName!=null)
         {
-            outputStream.write(Msg.getBytes());
+            outputStream.write(msg.getBytes());
         }
     }
 }
