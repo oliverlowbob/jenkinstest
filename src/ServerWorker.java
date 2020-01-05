@@ -3,7 +3,6 @@ import java.net.Socket;
 import java.util.List;
 
 /**
- * @author Jonas
  */
 
 public class ServerWorker extends Thread {

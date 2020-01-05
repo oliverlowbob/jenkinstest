@@ -3,7 +3,6 @@ import java.net.Socket;
 import java.util.Scanner;
 
 /**
- * @author Jonas
  */
 public class ResponseListener implements Runnable {
     private Socket socket;

@@ -4,7 +4,6 @@ import java.net.Socket;
 import java.util.Scanner;
 
 /**
- * @author Jonas
  * webhooktest
  */
 
